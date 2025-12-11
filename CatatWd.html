@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert Data</title>
+    <style>
+		/* --- STYLING EFEK SALJU JATUH --- */
+        .snowflake {
+            color: #fff;
+            font-size: 1.5em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: -10%;
+            z-index: 1000;
+        }
+        @keyframes fall {
+            0% { top: -10%; opacity: 1; }
+            100% { top: 100%; opacity: 0.5; }
+        }	
+			
+		body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: url('https://i.ibb.co/Z6gwNhKF/bg.jpg');
+            background-attachment: fixed;
+            background-size: cover; 
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.4); 
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4); /* Shadow diubah agar lebih terlihat */
+            width: 95%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 150px;
+            box-sizing: border-box;
+            font-family: monospace;
+			border-color: 1;
+            background-color: rgba(255, 255, 255, 0.4); 
+        }
+
+        /* --- STYLING KHUSUS UNTUK TOMBOL BERDAMPINGAN --- */
+        #button-wrapper {
+            display: flex;
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+
+        button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%; 
+            box-sizing: border-box;
+        }
+        
+        /* Tombol Convert */
+        #convertButton {
+            background-color: #007bff;
+        }
+
+        #convertButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Tombol Copy */
+        #copyButton {
+            background-color: #28a745; 
+            display: none; 
+        }
+
+        #copyButton:hover {
+            background-color: #1e7e34;
+        }
+
+        /* --- STYLING SISANYA (dipertahankan) --- */
+        #outputContainer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+        .warning {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .sort-info {
+            text-align: center;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div id='snow-container'></div>
+	<div class="container">
+        <textarea id="inputText" placeholder="Paste data here..."></textarea>
+        
+        <div id="button-wrapper">
+            <button id="convertButton">CONVERT</button>
+            <button id="copyButton">COPY DATA</button> </div>
+    </div>
+
+    <div class="container" id="outputContainer">
+        <p id="rowCountInfo"></p>
+        <div id="tableOutput">
+        </div>
+        <p class="warning" id="warningMessage"></p>
+    </div>
+
+    <script>
+        document.getElementById('convertButton').addEventListener('click', convertData);
+        document.getElementById('copyButton').addEventListener('click', copyTableData);
+
+        function cleanStringIfEndsWithBaru(str) {
+            const trimmedStr = str.trim();
+            const regex = /\s*?(Baru)$/i;
+            return trimmedStr.replace(regex, '');
+        }
+        
+        function cleanAndFormatDeposit(str) {
+            const cleanedStr = str.trim()
+                                     .replace(/rp\s*/i, '') 
+                                     .replace(/\./g, '') 
+                                     .replace(/,/g, '') 
+                                     .trim();
+
+            if (cleanedStr === '') {
+                return '-'; 
+            }
+            
+            return '-' + cleanedStr;
+        }
+
+
+        function convertData() {
+            const inputText = document.getElementById('inputText').value;
+            const tableOutput = document.getElementById('tableOutput');
+            const warningMessage = document.getElementById('warningMessage');
+            const rowCountInfo = document.getElementById('rowCountInfo');
+            const copyButton = document.getElementById('copyButton');
+            
+            const groupSize = 13;
+            
+            const columnDefinitions = [
+                { type: 'data', index: 0, name: 'No', validate: false, format: null },
+                { type: 'data', index: 5, name: 'Name', validate: false, format: null },
+                { type: 'data', index: 8, name: 'Deposit', validate: false, format: 'deposit' },
+                { type: 'empty', name: '', validate: false, format: null }, 
+                { type: 'empty', name: '', validate: false, format: null }, 
+                { type: 'empty', name: '', validate: false, format: null }, 
+                { type: 'data', index: 7, name: 'Username', validate: true, format: null } 
+            ];
+
+            const lines = inputText.split('\n')
+                                     .map(line => line.trim())
+                                     .filter(line => line.length > 0);
+            
+            const totalLines = lines.length;
+            
+            tableOutput.innerHTML = '';
+            warningMessage.textContent = '';
+            copyButton.style.display = 'none'; 
+
+            if (totalLines === 0) {
+                tableOutput.innerHTML = '<p>Masukkan data terlebih dahulu.</p>';
+                rowCountInfo.textContent = '';
+                return;
+            }
+            
+            const numRows = Math.floor(totalLines / groupSize);
+            let tableRows = [];
+            for (let i = 0; i < numRows; i++) {
+                let fullRow = [];
+                for (let j = 0; j < groupSize; j++) {
+                    const dataIndex = (i * groupSize) + j;
+                    fullRow.push(dataIndex < totalLines ? lines[dataIndex] : '');
+                }
+                tableRows.push(fullRow);
+            }
+
+            // MENGURUTKAN ASCENDING
+            tableRows.sort((a, b) => {
+                const valA = String(a[0]);
+                const valB = String(b[0]);
+                return valA.localeCompare(valB);
+            });
+            
+            // Membuat struktur tabel
+            let tableHTML = '<table id="resultTable">';
+            
+            tableHTML += '<thead><tr>';
+            columnDefinitions.forEach(col => {
+                tableHTML += `<th>${col.name}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            tableHTML += '<tbody>';
+
+            // Mengisi baris tabel
+            tableRows.forEach(fullRow => {
+                tableHTML += '<tr>';
+                
+                columnDefinitions.forEach(col => {
+                    let cellData = '';
+                    let cssClass = '';
+
+                    if (col.type === 'data') {
+                        cellData = fullRow[col.index];
+                        
+                        if (col.validate) {
+                            cellData = cleanStringIfEndsWithBaru(cellData);
+                            cssClass = 'validated-col';
+                        }
+                        
+                        if (col.format === 'deposit') {
+                            cellData = cleanAndFormatDeposit(cellData);
+                            cssClass = (cssClass ? cssClass + ' ' : '') + 'deposit-col';
+                        }
+                        
+                        tableHTML += `<td class="${cssClass}">${cellData}</td>`;
+                        
+                    } else {
+                        tableHTML += `<td class="empty-col"></td>`;
+                    }
+                });
+                
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            
+            tableOutput.innerHTML = tableHTML;
+
+            // Tampilkan tombol copy di atas
+            if (numRows > 0) {
+                copyButton.style.display = 'block';
+            }
+        }
+        
+        /**
+         * Menyalin data tabel ke clipboard, MENGECUALIKAN Kolom pertama (Kolom 'No').
+         */
+        async function copyTableData() {
+            const table = document.getElementById('resultTable');
+            if (!table) {
+                alert('Tabel tidak ditemukan. Silakan klik Convert terlebih dahulu.');
+                return;
+            }
+
+            const body = table.querySelector('tbody');
+            if (!body) {
+                return;
+            }
+
+            let dataToCopy = '';
+            const rows = body.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let rowData = [];
+                
+                // Iterasi dimulai dari indeks 1 (sel kedua = Kolom 'Name')
+                for (let i = 1; i < cells.length; i++) {
+                    const cell = cells[i];
+                    let text = cell.textContent || '';
+                    
+                    if (cell.classList.contains('empty-col')) {
+                        text = ''; 
+                    }
+                    rowData.push(text.trim());
+                }
+                
+                dataToCopy += rowData.join('\t') + '\n';
+            });
+
+            dataToCopy = dataToCopy.trim();
+
+            try {
+                await navigator.clipboard.writeText(dataToCopy);
+                
+                const btn = document.getElementById('copyButton');
+                btn.textContent = 'BERHASIL DISALIN!';
+                setTimeout(() => {
+                    btn.textContent = 'COPY DATA';
+                }, 1500);
+
+            } catch (err) {
+                console.error('Gagal menyalin:', err);
+                alert('Gagal menyalin data. (Pastikan Anda menggunakan HTTPS atau localhost)');
+            }
+        }
+		
+		// --- SCRIPT UNTUK EFEK SALJU JATUH ---
+        const snowContainer = document.getElementById('snow-container');
+        const totalSnowflakes = 50; 
+        const snowflakes = ['❅','❅', '❆', '*'];
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            
+            snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)]; 
+
+            const duration = Math.random() * 10 + 5; 
+            snowflake.style.animationDuration = `${duration}s`;
+
+            snowflake.style.left = `${Math.random() * 100}%`; 
+            snowflake.style.animationDelay = `${Math.random() * 10}s`; 
+
+            snowflake.style.animationName = 'fall';
+            snowflake.style.animationIterationCount = 'infinite';
+            snowflake.style.opacity = Math.random() * 0.5 + 0.5; 
+
+            snowContainer.appendChild(snowflake);
+
+            snowflake.addEventListener('animationend', function() {
+                this.remove();
+                createSnowflake(); 
+            });
+        }
+
+        for (let i = 0; i < totalSnowflakes; i++) {
+            setTimeout(createSnowflake, Math.random() * 5000); 
+        }
+// ------------------------------------
+		
+    </script>
+
+</body>
+</html>

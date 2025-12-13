@@ -3,102 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convert Data</title>
+    <title>☃️ Konverter Data Salju</title>
     <style>
-		/* --- STYLING EFEK SALJU JATUH --- */
+        /* Variabel Warna Tema Salju */
+        :root {
+            --snow-white: #ffffff;
+            --ice-blue: #a3daff;
+            --deep-blue: #1c5e8c;
+            --light-frost: rgba(255, 255, 255, 0.85); /* Kontainer hampir buram */
+            --dark-frost: rgba(255, 255, 255, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- STYLING EFEK SALJU JATUH --- */
         .snowflake {
-            color: #fff;
-            font-size: 1.5em;
+            color: var(--ice-blue); /* Salju berwarna es */
+            font-size: 1.8em;
             font-family: Arial, sans-serif;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             position: fixed;
             top: -10%;
             z-index: 1000;
+            pointer-events: none; /* Penting agar tidak menghalangi interaksi */
         }
         @keyframes fall {
-            0% { top: -10%; opacity: 1; }
-            100% { top: 100%; opacity: 0.5; }
-        }	
-			
-		body {
-            font-family: Arial, sans-serif;
+            0% { top: -10%; opacity: 0.9; transform: rotate(0deg); }
+            100% { top: 100%; opacity: 0.4; transform: rotate(360deg); }
+        }
+            
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            background-image: url('https://i.ibb.co/Z6gwNhKF/bg.jpg');
+            padding: 30px 10px;
+            /* Latar belakang salju yang netral */
+            background-image: url('https://i.ibb.co/Z6gwNhKF/bg.jpg'); 
             background-attachment: fixed;
-            background-size: cover; 
-            background-color: #f4f4f4;
+            background-size: cover;
+            background-color: var(--deep-blue);
+            min-height: 100vh;
+            color: var(--deep-blue);
         }
 
         .container {
-            background-color: rgba(255, 255, 255, 0.4); 
+            background-color: var(--light-frost); /* Hampir buram */
+            backdrop-filter: blur(5px); /* Efek buram pada latar belakang */
+            border: 2px solid var(--ice-blue); /* Border es */
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4); /* Shadow diubah agar lebih terlihat */
+            border-radius: 15px;
+            box-shadow: 0 8px 25px var(--shadow-color); /* Shadow lebih dalam */
             width: 95%;
             max-width: 800px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid var(--ice-blue);
+            border-radius: 8px;
             resize: vertical;
-            min-height: 150px;
+            min-height: 180px;
             box-sizing: border-box;
             font-family: monospace;
-			border-color: 1;
-            background-color: rgba(255, 255, 255, 0.4); 
+            font-size: 14px;
+            background-color: var(--dark-frost); /* Sedikit lebih transparan */
+            color: var(--deep-blue);
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--deep-blue);
+            box-shadow: 0 0 5px var(--ice-blue);
+            outline: none;
         }
 
         /* --- STYLING KHUSUS UNTUK TOMBOL BERDAMPINGAN --- */
         #button-wrapper {
             display: flex;
-            gap: 10px; 
-            margin-top: 15px; 
+            gap: 15px;
+            margin-top: 15px;
         }
 
         button {
-            padding: 10px 20px;
-            color: white;
+            padding: 12px 25px;
+            color: var(--snow-white);
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%; 
+            font-size: 17px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
             box-sizing: border-box;
+            text-transform: uppercase;
         }
-        
-        /* Tombol Convert */
+           
+        /* Tombol Convert (Warna Biru Laut/Deep Blue) */
         #convertButton {
-            background-color: #007bff;
+            background-color: var(--deep-blue);
         }
 
         #convertButton:hover {
-            background-color: #0056b3;
+            background-color: #2e7bb0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
 
-        /* Tombol Copy */
+        /* Tombol Copy (Warna Hijau/Minty Ice) */
         #copyButton {
-            background-color: #28a745; 
-            display: none; 
+            background-color: #20b2aa; /* Mint/Cyan */
+            display: none;
         }
 
         #copyButton:hover {
-            background-color: #1e7e34;
+            background-color: #1a8e86;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
 
-        /* --- STYLING SISANYA (dipertahankan) --- */
+        /* --- STYLING SISANYA --- */
         #outputContainer {
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px dashed #ccc;
+            border-top: 2px dashed var(--ice-blue);
+        }
+        
+        #rowCountInfo {
+            text-align: center;
+            font-weight: bold;
+            color: var(--deep-blue);
+            margin-bottom: 15px;
         }
 
         table {
@@ -106,30 +143,32 @@
             border-collapse: collapse;
             margin-top: 15px;
             font-size: 0.9em;
+            background-color: var(--snow-white); /* Tabel lebih terang */
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid var(--ice-blue);
+            padding: 10px;
             text-align: left;
         }
 
         th {
-            background-color: #e9ecef;
-            color: #333;
+            background-color: var(--ice-blue);
+            color: var(--deep-blue);
+            font-weight: bold;
         }
 
+        tr:nth-child(even) {
+            background-color: #f0f8ff; /* Aksen salju pada baris genap */
+        }
+        
         .warning {
-            color: red;
+            color: #d9534f; /* Merah tetap untuk peringatan */
             font-weight: bold;
             text-align: center;
-            margin-top: 10px;
-        }
-
-        .sort-info {
-            text-align: center;
-            margin-bottom: 10px;
-            font-style: italic;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -137,15 +176,17 @@
 
     <div id='snow-container'></div>
 	<div class="container">
-        <textarea id="inputText" placeholder="Paste data here..."></textarea>
+        <h2 style="color: var(--deep-blue); text-align: center;">❄️ Convert Data ❄️</h2>
+        <textarea id="inputText" placeholder="Input your data below..."></textarea>
         
         <div id="button-wrapper">
-            <button id="convertButton">CONVERT</button>
-            <button id="copyButton">COPY DATA</button> </div>
+            <button id="convertButton">CONVERT DATA</button>
+            <button id="copyButton">COPY DATA</button>
+        </div>
     </div>
 
     <div class="container" id="outputContainer">
-        <p id="rowCountInfo"></p>
+        <p id="rowCountInfo">Klik CONVERT untuk melihat hasil...</p>
         <div id="tableOutput">
         </div>
         <p class="warning" id="warningMessage"></p>
@@ -163,16 +204,17 @@
         
         function cleanAndFormatDeposit(str) {
             const cleanedStr = str.trim()
-                                     .replace(/rp\s*/i, '') 
-                                     .replace(/\./g, '') 
-                                     .replace(/,/g, '') 
-                                     .trim();
+                                       .replace(/rp\s*/i, '')
+                                       .replace(/\./g, '')
+                                       .replace(/,/g, '')
+                                       .trim();
 
-            if (cleanedStr === '') {
-                return '-'; 
+            if (cleanedStr === '' || cleanedStr === '0') {
+                return '-';
             }
             
-            return '-' + cleanedStr;
+            // Mengembalikan format Negatif untuk Deposit
+            return '-' + cleanedStr; 
         }
 
 
@@ -183,11 +225,12 @@
             const rowCountInfo = document.getElementById('rowCountInfo');
             const copyButton = document.getElementById('copyButton');
             
-            const groupSize = 13;
+            const groupSize = 13; // Tetap 13 baris per entri
             
+            // Definisi Kolom Tetap Sama
             const columnDefinitions = [
                 { type: 'data', index: 0, name: 'No', validate: false, format: null },
-                { type: 'data', index: 5, name: 'Name', validate: false, format: null },
+                { type: 'data', index: 5, name: 'Nama', validate: false, format: null },
                 { type: 'data', index: 8, name: 'Deposit', validate: false, format: 'deposit' },
                 { type: 'empty', name: '', validate: false, format: null }, 
                 { type: 'empty', name: '', validate: false, format: null }, 
@@ -196,8 +239,8 @@
             ];
 
             const lines = inputText.split('\n')
-                                     .map(line => line.trim())
-                                     .filter(line => line.length > 0);
+                                   .map(line => line.trim())
+                                   .filter(line => line.length > 0);
             
             const totalLines = lines.length;
             
@@ -206,27 +249,41 @@
             copyButton.style.display = 'none'; 
 
             if (totalLines === 0) {
-                tableOutput.innerHTML = '<p>Masukkan data terlebih dahulu.</p>';
-                rowCountInfo.textContent = '';
+                tableOutput.innerHTML = '<p style="text-align: center;">Masukkan data terlebih dahulu di kolom atas.</p>';
+                rowCountInfo.textContent = 'Klik CONVERT untuk melihat hasil...';
                 return;
             }
             
             const numRows = Math.floor(totalLines / groupSize);
+            const remainingLines = totalLines % groupSize;
+
+            if (numRows === 0) {
+                 warningMessage.textContent = 'Input data terlalu pendek. Diperlukan minimal 13 baris.';
+                 rowCountInfo.textContent = `Total Baris Input: ${totalLines} | Baris Output: 0`;
+                 return;
+            }
+            
+            // Peringatan jika ada baris yang tersisa (data tidak lengkap)
+            if (remainingLines > 0) {
+                warningMessage.textContent = `⚠️ PERINGATAN: Terdapat ${remainingLines} baris data sisa yang diabaikan (bukan kelipatan 13).`;
+            }
+
             let tableRows = [];
             for (let i = 0; i < numRows; i++) {
                 let fullRow = [];
                 for (let j = 0; j < groupSize; j++) {
                     const dataIndex = (i * groupSize) + j;
-                    fullRow.push(dataIndex < totalLines ? lines[dataIndex] : '');
+                    fullRow.push(lines[dataIndex]);
                 }
                 tableRows.push(fullRow);
             }
 
-            // MENGURUTKAN ASCENDING
+            // MENGURUTKAN ASCENDING berdasarkan Kolom 'No' (Index 0)
             tableRows.sort((a, b) => {
                 const valA = String(a[0]);
                 const valB = String(b[0]);
-                return valA.localeCompare(valB);
+                // Menggunakan localeCompare untuk pengurutan alfanumerik yang aman
+                return valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' });
             });
             
             // Membuat struktur tabel
@@ -249,6 +306,7 @@
                     let cssClass = '';
 
                     if (col.type === 'data') {
+                        // Ambil data mentah
                         cellData = fullRow[col.index];
                         
                         if (col.validate) {
@@ -264,6 +322,7 @@
                         tableHTML += `<td class="${cssClass}">${cellData}</td>`;
                         
                     } else {
+                        // Kolom Kosong
                         tableHTML += `<td class="empty-col"></td>`;
                     }
                 });
@@ -274,8 +333,9 @@
             tableHTML += '</tbody></table>';
             
             tableOutput.innerHTML = tableHTML;
+            rowCountInfo.textContent = `✅ Konversi Selesai!`;
 
-            // Tampilkan tombol copy di atas
+            // Tampilkan tombol copy
             if (numRows > 0) {
                 copyButton.style.display = 'block';
             }
@@ -323,7 +383,7 @@
                 await navigator.clipboard.writeText(dataToCopy);
                 
                 const btn = document.getElementById('copyButton');
-                btn.textContent = 'BERHASIL DISALIN!';
+                btn.textContent = 'BERHASIL DISALIN! 🥳';
                 setTimeout(() => {
                     btn.textContent = 'COPY DATA';
                 }, 1500);
@@ -333,11 +393,11 @@
                 alert('Gagal menyalin data. (Pastikan Anda menggunakan HTTPS atau localhost)');
             }
         }
-		
-		// --- SCRIPT UNTUK EFEK SALJU JATUH ---
+        
+        // --- SCRIPT UNTUK EFEK SALJU JATUH ---
         const snowContainer = document.getElementById('snow-container');
-        const totalSnowflakes = 50; 
-        const snowflakes = ['❅','❅', '❆', '*'];
+        const totalSnowflakes = 75; // Lebih banyak salju
+        const snowflakes = ['❅', '❆', '❄', '*'];
 
         function createSnowflake() {
             const snowflake = document.createElement('div');
@@ -345,31 +405,32 @@
             
             snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)]; 
 
-            const duration = Math.random() * 10 + 5; 
+            const duration = Math.random() * 8 + 6; // Durasi antara 6s dan 14s
             snowflake.style.animationDuration = `${duration}s`;
 
             snowflake.style.left = `${Math.random() * 100}%`; 
             snowflake.style.animationDelay = `${Math.random() * 10}s`; 
+            snowflake.style.fontSize = `${Math.random() * 0.8 + 1.5}em`; // Ukuran bervariasi
 
             snowflake.style.animationName = 'fall';
             snowflake.style.animationIterationCount = 'infinite';
-            snowflake.style.opacity = Math.random() * 0.5 + 0.5; 
+            snowflake.style.opacity = Math.random() * 0.7 + 0.3; 
 
             snowContainer.appendChild(snowflake);
 
-            snowflake.addEventListener('animationend', function() {
-                this.remove();
-                createSnowflake(); 
-            });
+            // Membuat loop salju jatuh
+            setTimeout(() => {
+                snowflake.remove();
+                createSnowflake();
+            }, duration * 1000); // Hapus setelah animasi selesai dan buat baru
         }
 
         for (let i = 0; i < totalSnowflakes; i++) {
             setTimeout(createSnowflake, Math.random() * 5000); 
         }
 // ------------------------------------
-		
+        
     </script>
 
 </body>
-
 </html>

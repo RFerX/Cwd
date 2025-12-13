@@ -50,6 +50,7 @@
             background-color: var(--light-frost); /* Hampir buram */
             backdrop-filter: blur(5px); /* Efek buram pada latar belakang */
             border: 2px solid var(--ice-blue); /* Border es */
+			background: rgba(255, 255, 255, 0.3);
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 8px 25px var(--shadow-color); /* Shadow lebih dalam */
@@ -177,7 +178,7 @@
     <div id='snow-container'></div>
 	<div class="container">
         <h2 style="color: var(--deep-blue); text-align: center;">❄️ Convert Data ❄️</h2>
-        <textarea id="inputText" placeholder="Input data disini..."></textarea>
+        <textarea id="inputText" placeholder="Input your data below..."></textarea>
         
         <div id="button-wrapper">
             <button id="convertButton">CONVERT DATA</button>
@@ -249,7 +250,7 @@
             copyButton.style.display = 'none'; 
 
             if (totalLines === 0) {
-                tableOutput.innerHTML = '<p style="text-align: center;">Convert data terlebih dahulu...</p>';
+                tableOutput.innerHTML = '<p style="text-align: center;">Masukkan data terlebih dahulu di kolom atas.</p>';
                 rowCountInfo.textContent = 'Klik CONVERT untuk melihat hasil...';
                 return;
             }
@@ -258,7 +259,7 @@
             const remainingLines = totalLines % groupSize;
 
             if (numRows === 0) {
-                 warningMessage.textContent = 'Data tidak valid.';
+                 warningMessage.textContent = 'Input data terlalu pendek. Diperlukan minimal 13 baris.';
                  rowCountInfo.textContent = `Total Baris Input: ${totalLines} | Baris Output: 0`;
                  return;
             }
@@ -390,7 +391,7 @@
 
             } catch (err) {
                 console.error('Gagal menyalin:', err);
-                alert('Gagal menyalin data.');
+                alert('Gagal menyalin data. (Pastikan Anda menggunakan HTTPS atau localhost)');
             }
         }
         
@@ -434,6 +435,3 @@
 
 </body>
 </html>
-
-
-

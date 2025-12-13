@@ -177,7 +177,7 @@
     <div id='snow-container'></div>
 	<div class="container">
         <h2 style="color: var(--deep-blue); text-align: center;">❄️ Convert Data ❄️</h2>
-        <textarea id="inputText" placeholder="Input your data below..."></textarea>
+        <textarea id="inputText" placeholder="Input data disini..."></textarea>
         
         <div id="button-wrapper">
             <button id="convertButton">CONVERT DATA</button>
@@ -258,7 +258,7 @@
             const remainingLines = totalLines % groupSize;
 
             if (numRows === 0) {
-                 warningMessage.textContent = 'Input data terlalu pendek. Diperlukan minimal 13 baris.';
+                 warningMessage.textContent = 'Data tidak valid.';
                  rowCountInfo.textContent = `Total Baris Input: ${totalLines} | Baris Output: 0`;
                  return;
             }
@@ -390,7 +390,7 @@
 
             } catch (err) {
                 console.error('Gagal menyalin:', err);
-                alert('Gagal menyalin data. (Pastikan Anda menggunakan HTTPS atau localhost)');
+                alert('Gagal menyalin data.');
             }
         }
         
@@ -434,5 +434,6 @@
 
 </body>
 </html>
+
 
 
